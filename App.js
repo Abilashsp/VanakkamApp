@@ -40,41 +40,84 @@ const App = () => {
   const [id, setid] = useState(0);
   const[list,setlist]=useState([])
   const [shows, setShows] = useState(false);
-  const [listshow,setlistshow]=useState(true);
-  const[Storeid,setStoreid]=useState(null)
   const[addnew,setaddnew]=useState(false);
+  const[editview,seteditview]=useState(false)
   const[editvalues,seteditvalues]=useState([]);
+  const[textedit,settextedit]=useState(null)
   const [css, setCss] = useState({
     fontname: " ",
     bgcolor: " ",
     fontsize: " ",
     fontColor: " ",
   });
+
+
+
   const db = SQLite.openDatabase("welcome.db");
-  const items=[];
-  const Save = () => {
+
+  const Save = (id, updatedValues, edittedtext) => {
+    if (addnew) {
+      db.transaction((t) => {
+        t.executeSql(
+          "UPDATE csstable SET Name = ?, fontsize = ?, fontcolor = ?, Bgcolor = ? WHERE id = ?",
+          [edittedtext, updatedValues.fontsize, updatedValues.fontColor, updatedValues.bgcolor, id],
+          (_, results) => {
+            console.log("Row updated successfully");
+            setlist((prevList) =>
+              prevList.map((item) =>
+                item.id === id ? { ...item, ...updatedValues, Name: edittedtext } : item
+              )
+            );
+            console.log(
+              "SQL UPDATE statement parameters:",
+              edittedtext,
+              updatedValues.fontsize,
+              updatedValues.fontColor,
+              updatedValues.bgcolor,
+              id
+            );
+            refreshList(); 
+          },
+          (error) => {
+            console.error("Error updating csstable:", error);
+          }
+        );
+      });
+    } else {
+      db.transaction((t) => {
+        t.executeSql(
+          "INSERT INTO csstable (Name, fontsize, fontcolor, Bgcolor) VALUES (?, ?, ?, ?)",
+          [text, css.fontsize, css.fontColor, css.bgcolor],
+          (_, results) => {
+            console.log("Row added successfully");
+            setlist((prevList) => [
+              ...prevList,
+              {
+                id: results.insertId, // Include the inserted id
+                Name: text,
+                fontsize: css.fontsize,
+                fontColor: css.fontColor,
+                Bgcolor: css.bgcolor,
+              },
+            ]);
+          },
+          (error) => {
+            console.error("Error inserting into csstable:", error);
+          }
+        );
+      });
+    }
+  };
+  
+  const refreshList = () => {
     db.transaction((t) => {
-      t.executeSql(
-        "INSERT INTO csstable (Name, fontsize, fontcolor, Bgcolor) VALUES (?, ?, ?, ?)",
-        [text, css.fontsize, css.fontColor, css.bgcolor],
-        (_, results) => {
-          console.log("Row added suceesfully");
-          setlist((prevList) => [
-            ...prevList,
-            {
-              Name: text,
-              fontsize: css.fontsize,
-              fontColor: css.fontColor,
-              Bgcolor: css.bgcolor,
-            },
-          ]);
-        },
-        (error) => {
-          console.error("Error inserting into csstable:", error);
-        }
-      );
+      t.executeSql("SELECT * FROM csstable", null, (_, { rows }) => {
+        const data = rows._array;
+        setlist(data);
+      });
     });
   };
+  
 
   const add = () => {
     setaddvalue(text);
@@ -85,6 +128,7 @@ const App = () => {
 
   const handlechange = (textvalue) => {
     settext(textvalue);
+    console.log(text)
   };
 
   const textselected = () => {
@@ -101,12 +145,9 @@ const App = () => {
 
 const addnewvalues=()=>{
   setaddnew(true)
+  // seteditview(false)
 }
-const ItemsIdPAss=(id)=>{
-  setStoreid(id)
-  setaddnew(false)
 
-}
 const back=()=>{
   setaddnew(false)
 }
@@ -114,8 +155,11 @@ const back=()=>{
 const geteditvalues=(item)=>{
   seteditvalues(item)
   console.log("getvaluesitem",editvalues)
+  setaddnew(false)
 }
-  
+
+
+
   useEffect(() => {
     db.transaction((t) => {
       t.executeSql(
@@ -126,9 +170,10 @@ const geteditvalues=(item)=>{
       t.executeSql("SELECT*FROM  csstable", null, (_, { rows }) => {
         const data = rows._array;
         setlist(data);
-        // // console.log("Data from the items: ", data);
+        
       });
     })
+    refreshList();
   },[]); 
 
   return (
@@ -137,8 +182,9 @@ const geteditvalues=(item)=>{
    <View className="flex-row items-center justify-around "> 
 
    <Text className="bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xl px-3 py-3 mt-10 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" onPress={back}><Icon name="arrow-left" style={{ color: 'white', textAlign: 'center', fontSize: 30  }}/></Text>
+   
    <TextInput className="bg-transparent border hover:bg-blue-800 focus:ring-4  w-1/2 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xl px-3 py-3 mt-10 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"  placeholder="values..." value={text}/>
-     <Text className="bg-green-500 hover:bg-blue-800 focus:ring-4 focus:outline-none  focus:ring-blue-300  font-medium rounded-lg text-xl px-3 py-3  mt-10 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" onPress={Save}><Icons name="save" style={{ color: 'white', textAlign: 'center', fontSize: 30  }}/></Text>
+     <Text className="bg-green-500 hover:bg-blue-800 focus:ring-4 focus:outline-none  focus:ring-blue-300  font-medium rounded-lg text-xl px-3 py-3  mt-10 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" onPress={()=>Save(editvalues,css,textedit)}><Icons name="save" style={{ color: 'white', textAlign: 'center', fontSize: 30  }}/></Text>
    
      </View>
       <InputText
@@ -151,9 +197,12 @@ const geteditvalues=(item)=>{
         selecetedText={selecetedText}
         css={css}
         Save={Save}
-        id={Storeid}
         list={list}
         editvalues={editvalues}
+        settextedit={settextedit}
+        addnew={addnew}
+        setCss={setCss}
+        editview={editview}
       />
       <NavigationContainer>
         <View className=" flex flex-row items-center justify-center h-screen ">

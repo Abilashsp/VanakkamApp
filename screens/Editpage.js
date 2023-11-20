@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Text, View, TextInput, Button, StyleSheet } from 'react-native';
 
-export default function InputText({ ...props }) {
+export default function Editpage({ ...props }) {
   const {
     selecetedText,
     addvalue,

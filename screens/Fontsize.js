@@ -19,19 +19,6 @@ export default function Fontsize({route}) {
       { "name": "text-base", "value": "text-base" },
       { "name": "text-sm", "value": "text-sm" },
       { "name": "text-xs", "value": "text-xs" },
-
-
-        
-        
-        
-       
-       
-       
-       
-       
-       
-      
-       
        
       ]
       
