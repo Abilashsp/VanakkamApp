@@ -7,12 +7,14 @@ import Fontsize from "./screens/Fontsize";
 import Fontcolor from "./screens/Fontcolor";
 import Bgcolor from "./screens/Bgcolor";
 import InputText from "./screens/InputText";
-import { View ,Button,Text,ScrollableTabView, ViewBase,TextInput} from 'react-native';
+import { View ,Button,Text,ScrollableTabView, ViewBase,TextInput, Alert} from 'react-native';
 import * as SQLite from "expo-sqlite";
 import List from "./screens/List";
 import Displaydata from "./screens/Displaydata";
 import Icon from 'react-native-vector-icons/EvilIcons'
 import Icons from 'react-native-vector-icons/FontAwesome';
+import Editpage from "./screens/Editpage";
+import SvgComponent from "./screens/Svg"
 
 const Tab = createMaterialTopTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -43,7 +45,8 @@ const App = () => {
   const[addnew,setaddnew]=useState(false);
   const[editview,seteditview]=useState(false)
   const[editvalues,seteditvalues]=useState([]);
-  const[textedit,settextedit]=useState(null)
+  const[textedit,settextedit]=useState("")
+  const[changes,setchange]=useState([])
   const [css, setCss] = useState({
     fontname: " ",
     bgcolor: " ",
@@ -51,12 +54,33 @@ const App = () => {
     fontColor: " ",
   });
 
+  
+
 
 
   const db = SQLite.openDatabase("welcome.db");
 
-  const Save = (id, updatedValues, edittedtext) => {
-    if (addnew) {
+  const createTwoButtonAlert = () =>{
+  Alert.alert('Do you want Save?', '', [
+    {
+      text: 'Cancel',
+      onPress: () => back(),
+      style: 'cancel',
+    },
+      {text: 'OK', onPress: ()=>Save(editvalues,css,textedit,true)},
+  ]
+  )
+}
+
+const savedTwoButtonAlert = () =>{
+  Alert.alert('Sucessfully Done', '', [
+      {text: 'OK', onPress: ()=>Save(editvalues,css,textedit)},
+  ]
+  )
+}
+
+  const Save = (id, updatedValues, edittedtext,goBackAfterSave) => {
+    if (editview) {
       db.transaction((t) => {
         t.executeSql(
           "UPDATE csstable SET Name = ?, fontsize = ?, fontcolor = ?, Bgcolor = ? WHERE id = ?",
@@ -77,6 +101,10 @@ const App = () => {
               id
             );
             refreshList(); 
+            if (goBackAfterSave) {
+              back();
+            }
+            settext('')
           },
           (error) => {
             console.error("Error updating csstable:", error);
@@ -100,12 +128,16 @@ const App = () => {
                 Bgcolor: css.bgcolor,
               },
             ]);
+            if (goBackAfterSave) {
+              back();
+            }
           },
           (error) => {
             console.error("Error inserting into csstable:", error);
           }
         );
       });
+      settext('')
     }
   };
   
@@ -140,6 +172,7 @@ const App = () => {
       ...prevValues,
       [field]: value,
     }));
+ 
   };
 // console.log(css.fontColor)
 
@@ -150,12 +183,13 @@ const addnewvalues=()=>{
 
 const back=()=>{
   setaddnew(false)
+  seteditview(false)
 }
 
 const geteditvalues=(item)=>{
   seteditvalues(item)
-  console.log("getvaluesitem",editvalues)
-  setaddnew(false)
+  // console.log("getvaluesitem",editvalues)
+ seteditview(true)
 }
 
 
@@ -178,16 +212,16 @@ const geteditvalues=(item)=>{
 
   return (
     <View className=""> 
-    {addnew?(<View className=""> 
-   <View className="flex-row items-center justify-around "> 
-
-   <Text className="bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xl px-3 py-3 mt-10 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" onPress={back}><Icon name="arrow-left" style={{ color: 'white', textAlign: 'center', fontSize: 30  }}/></Text>
+{editview?
+ <View className="">
+  <View className="flex-row items-center justify-around "> 
+   
+   <Text className="bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xl px-3 py-3 mt-10 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" onPress={createTwoButtonAlert }><Icon name="arrow-left" style={{ color: 'white', textAlign: 'center', fontSize: 30  }}/></Text>
    
    <TextInput className="bg-transparent border hover:bg-blue-800 focus:ring-4  w-1/2 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xl px-3 py-3 mt-10 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"  placeholder="values..." value={text}/>
-     <Text className="bg-green-500 hover:bg-blue-800 focus:ring-4 focus:outline-none  focus:ring-blue-300  font-medium rounded-lg text-xl px-3 py-3  mt-10 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" onPress={()=>Save(editvalues,css,textedit)}><Icons name="save" style={{ color: 'white', textAlign: 'center', fontSize: 30  }}/></Text>
-   
+     <Text className="bg-white hover:bg-blue-800 focus:ring-4 focus:outline-none  focus:ring-blue-300  font-medium rounded-lg text-xl px-3 py-3  mt-10 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" onPress={savedTwoButtonAlert}><Icons name="edit" style={{ color: 'black', textAlign: 'center', fontSize: 30  }}/></Text>
      </View>
-      <InputText
+     <Editpage
         text={text}
         addvalue={addvalue}
         handlechange={handlechange}
@@ -203,53 +237,138 @@ const geteditvalues=(item)=>{
         addnew={addnew}
         setCss={setCss}
         editview={editview}
+        setchange={setchange}
+        changes={changes}
+        textedit={textedit}
       />
-      <NavigationContainer>
-        <View className=" flex flex-row items-center justify-center h-screen ">
-          <Tab.Navigator
-         overScrollMode={"auto"}
-            screenOptions={{
-              labelStyle: {
-                fontSize: 14,
-                fontWeight: "bold",
-              },
-              activeTintColor: "#ffffff",
-              inactiveTintColor: "#000000",
-              pressOpacity: 1,
-              indicatorStyle: {
-                backgroundColor: "black",
-                height: 30,
-                borderRadius: 30,
-                top: 9,
-              },
-              tabStyle: {
-                width: "auto",
-                scrollEnabled: true
-              },
-            }}
-          >
-            {components.map((comps) => (
-              <Tab.Screen
-                key={comps.name}
-                name={comps.name}
-                component={comps.comp}
-                initialParams={{ getcss: getcss }}
-                
-              />
-              
-            ))}
-          </Tab.Navigator>
-        </View>
-      </NavigationContainer>
-      </View>):( 
-        <View className="h-screen flex justify-center" >
         <NavigationContainer>
-        <Stack.Navigator initialRouteName="List">
-        <Stack.Screen name="VANAKKAM"  initialParams={{ list: list}}>{props => <List {...props} list={list} addnewvalues={addnewvalues} geteditvalues={geteditvalues}/>}</Stack.Screen>
-        <Stack.Screen name="Displaydata" >{props => <Displaydata {...props} list={list} />}</Stack.Screen>
-        </Stack.Navigator>
-        </NavigationContainer>
-      </View>)}
+           <View className=" flex flex-row items-center justify-center h-screen ">
+             <Tab.Navigator
+            overScrollMode={"auto"}
+               screenOptions={{
+                 labelStyle: {
+                   fontSize: 14,
+                   fontWeight: "bold",
+                 },
+                 activeTintColor: "#ffffff",
+                 inactiveTintColor: "#000000",
+                 pressOpacity: 1,
+                 indicatorStyle: {
+                   backgroundColor: "black",
+                   height: 30,
+                   borderRadius: 30,
+                   top: 9,
+                 },
+                 tabStyle: {
+                   width: "auto",
+                   scrollEnabled: true
+                 },
+               }}
+             >
+               {components.map((comps) => (
+                 <Tab.Screen
+                   key={comps.name}
+                   name={comps.name}
+                   component={comps.comp}
+                   initialParams={{ getcss: getcss }}
+                   
+                 />
+                 
+               ))}
+             </Tab.Navigator>
+           </View>
+         </NavigationContainer>
+       </View>
+      :addnew?(<View className=""> 
+      <View className="flex-row items-center justify-around "> 
+   
+      <Text className="bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xl px-3 py-3 mt-10 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" onPress={text?createTwoButtonAlert:back }><Icon name="arrow-left" style={{ color: 'white', textAlign: 'center', fontSize: 30  }}/></Text>
+      
+      <TextInput className="bg-transparent border hover:bg-blue-800 focus:ring-4  w-1/2 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xl px-3 py-3 mt-10 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"  placeholder="values..." value={text}/>
+        <Text className="bg-green-500 hover:bg-blue-800 focus:ring-4 focus:outline-none  focus:ring-blue-300  font-medium rounded-lg text-xl px-3 py-3  mt-10 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" onPress={savedTwoButtonAlert}><Icons name="save" style={{ color: 'white', textAlign: 'center', fontSize: 30  }}/></Text>
+      
+        </View>
+         <InputText
+           text={text}
+           addvalue={addvalue}
+           handlechange={handlechange}
+           textselected={textselected}
+           add={add}
+           shows={shows}
+           selecetedText={selecetedText}
+           css={css}
+           Save={Save}
+           list={list}
+           editvalues={editvalues}
+           settextedit={settextedit}
+           addnew={addnew}
+           setCss={setCss}
+           editview={editview}
+         />
+         <NavigationContainer>
+           <View className=" flex flex-row items-center justify-center h-screen ">
+             <Tab.Navigator
+            overScrollMode={"auto"}
+               screenOptions={{
+                 labelStyle: {
+                   fontSize: 14,
+                   fontWeight: "bold",
+                 },
+                 activeTintColor: "#ffffff",
+                 inactiveTintColor: "#000000",
+                 pressOpacity: 1,
+                 indicatorStyle: {
+                   backgroundColor: "black",
+                   height: 30,
+                   borderRadius: 30,
+                   top: 9,
+                 },
+                 tabStyle: {
+                   width: "auto",
+                   scrollEnabled: true
+                 },
+               }}
+             >
+               {components.map((comps) => (
+                 <Tab.Screen
+                   key={comps.name}
+                   name={comps.name}
+                   component={comps.comp}
+                   initialParams={{ getcss: getcss }}
+                   
+                 />
+                 
+               ))}
+             </Tab.Navigator>
+           </View>
+         </NavigationContainer>
+         </View>):( 
+           <View className="h-screen flex justify-center" >
+           <NavigationContainer>
+           <Stack.Navigator initialRouteName="List">
+           <Stack.Screen
+        name="VANAKKAM"
+        initialParams={{ list: list }}
+        options={{
+          headerTitle: props => (
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <SvgComponent width={50} height={45} color="#000000"/>
+              <View style={{ marginLeft: 0}} />
+              <Text {...props} style={{ fontSize: 25, fontWeight: 'bold',padding:5,borderRadius:10 }}>
+                {props.children}
+              </Text>
+            </View>
+          ),
+        }}
+      >
+        {props => <List {...props} list={list} addnewvalues={addnewvalues} geteditvalues={geteditvalues} />}
+      </Stack.Screen>
+           <Stack.Screen name="Displaydata" >{props => <Displaydata {...props} list={list} />}</Stack.Screen>
+           </Stack.Navigator>
+           </NavigationContainer>
+         </View>)}
+
+    
     </View>
   );
 };

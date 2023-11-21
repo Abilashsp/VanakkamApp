@@ -32,6 +32,7 @@ export default function Editpage({ ...props }) {
   const handleEditableTextChange = (newValue) => {
     setEditableText(newValue);
     settextedit(newValue) 
+
   };
 
   useEffect(() => {
@@ -42,10 +43,13 @@ export default function Editpage({ ...props }) {
     });
   }, [css]);
 
+  
+
+
 
   return (
     <View>
-    {addnew && (
+
       <View
         className={`py-36 mt-1 ${cssStyle.bgcolor} ${
           selecetedText ? 'border-gray-200 rounded-lg shadow dark:bg-gray-800' : ''
@@ -58,21 +62,7 @@ export default function Editpage({ ...props }) {
           onChangeText={handleEditableTextChange}
         />
       </View>
-    )}
-  
-     
-      {/* <View
-        className={`py-36 mt-1 ${css.bgcolor} ${
-          selecetedText ? 'border-gray-200 rounded-lg shadow dark:bg-gray-800' : ''
-        } dark:border-gray-700`}
-      >
-        <TextInput
-          className={`${css.fontColor} ${css.fontsize} ${css.fontname} dark:text-white text-center`}
-          value={text}
-          placeholder="Enter text..."
-          onChangeText={handlechange}
-        />
-      </View> */}
+
     
   </View>
   );

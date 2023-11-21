@@ -1,5 +1,5 @@
 import { Text, View } from 'react-native';
-
+import SvgComponent from "./Svg"
 
 
 export default function Displaydata({route,list}) {
@@ -14,6 +14,7 @@ export default function Displaydata({route,list}) {
         <View className={` h-screen flex justify-center ${selectedItem.Bgcolor}`}>
           
               <Text className={` text-center ${selectedItem.fontcolor} ${selectedItem.fontsize} `}>{selectedItem.Name}</Text>
+             
          
      </View>
       

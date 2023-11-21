@@ -17,51 +17,33 @@ export default function InputText({ ...props }) {
     list,
     settextedit,
     setCss,
-    editview
+    editview,
+    
   } = props;
 
   const selectedItem = list.find((listitem) => listitem.id === editvalues);
 
-  const [editableText, setEditableText] = useState(selectedItem?.Name || '');
-  const [cssStyle, setCSSStyle] = useState({
-    bgcolor:selectedItem?.Bgcolor,
-    fontsize: selectedItem?.fontcolor,
-    fontColor: selectedItem?.fontname,
-  })
 
-  const handleEditableTextChange = (newValue) => {
-    setEditableText(newValue);
-    settextedit(newValue) 
-  };
+  // const [editableText, setEditableText] = useState(selectedItem?.Name || '');
+ 
 
-  useEffect(() => {
-    setCSSStyle({
-      bgcolor: css.bgcolor,
-      fontsize: css.fontsize,
-      fontColor: css.fontColor,
-    });
-  }, [css]);
+  // const handleEditableTextChange = (newValue) => {
+  //   setEditableText(newValue);
+  //   settextedit(newValue) 
+  // };
 
+  // useEffect(() => {
+  //   setCSSStyle({
+  //     bgcolor: css.bgcolor,
+  //     fontsize: css.fontsize,
+  //     fontColor: css.fontColor,
+  //   });
+  // }, [css]);
 
+console.log(editview)
   return (
-    <View>
-    {addnew && (
-      <View
-        className={`py-36 mt-1 ${cssStyle.bgcolor} ${
-          selecetedText ? 'border-gray-200 rounded-lg shadow dark:bg-gray-800' : ''
-        } dark:border-gray-700`}
-      >
-        <TextInput
-          className={`${cssStyle.fontColor} ${cssStyle.fontsize} dark:text-white text-center`}
-          value={editableText}
-          placeholder="Enter text..."
-          onChangeText={handleEditableTextChange}
-        />
-      </View>
-    )}
   
-     
-      {/* <View
+       <View
         className={`py-36 mt-1 ${css.bgcolor} ${
           selecetedText ? 'border-gray-200 rounded-lg shadow dark:bg-gray-800' : ''
         } dark:border-gray-700`}
@@ -72,8 +54,7 @@ export default function InputText({ ...props }) {
           placeholder="Enter text..."
           onChangeText={handlechange}
         />
-      </View> */}
+      </View> 
     
-  </View>
   );
 }
