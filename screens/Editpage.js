@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useRef } from 'react';
 import { Text, View, TextInput, Button, StyleSheet } from 'react-native';
 
 export default function Editpage({ ...props }) {
@@ -21,6 +21,7 @@ export default function Editpage({ ...props }) {
   } = props;
 
   const selectedItem = list.find((listitem) => listitem.id === editvalues);
+  const inputref=useRef(null);
 
   const [editableText, setEditableText] = useState(selectedItem?.Name || '');
   const [cssStyle, setCSSStyle] = useState({
@@ -43,7 +44,14 @@ export default function Editpage({ ...props }) {
     });
   }, [css]);
 
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      inputref.current?.focus();
+    }, 0);
   
+    return () => clearTimeout(timeoutId);
+  }, []);
 
 
 
@@ -58,6 +66,7 @@ export default function Editpage({ ...props }) {
         <TextInput
           className={`${cssStyle.fontColor} ${cssStyle.fontsize} dark:text-white text-center`}
           value={editableText}
+          ref={inputref}
           placeholder="Enter text..."
           onChangeText={handleEditableTextChange}
         />

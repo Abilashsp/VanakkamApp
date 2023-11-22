@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useRef } from 'react';
 import { Text, View, TextInput, Button, StyleSheet } from 'react-native';
 
 export default function InputText({ ...props }) {
@@ -18,29 +18,36 @@ export default function InputText({ ...props }) {
     settextedit,
     setCss,
     editview,
-    
   } = props;
 
   const selectedItem = list.find((listitem) => listitem.id === editvalues);
 
+  const inputref=useRef(null);
 
-  // const [editableText, setEditableText] = useState(selectedItem?.Name || '');
- 
 
-  // const handleEditableTextChange = (newValue) => {
-  //   setEditableText(newValue);
-  //   settextedit(newValue) 
-  // };
+  useEffect(() => {
+    if (addnew) {
+      setCss({
+        fontname: "",
+        bgcolor: "",
+        fontsize: "",
+        fontColor: "",
+      });
+    }
 
-  // useEffect(() => {
-  //   setCSSStyle({
-  //     bgcolor: css.bgcolor,
-  //     fontsize: css.fontsize,
-  //     fontColor: css.fontColor,
-  //   });
-  // }, [css]);
+  }, [addnew]);
 
-console.log(editview)
+
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      inputref.current?.focus();
+    }, 0);
+  
+    return () => clearTimeout(timeoutId);
+  }, []);
+
+
   return (
   
        <View
@@ -51,6 +58,7 @@ console.log(editview)
         <TextInput
           className={`${css.fontColor} ${css.fontsize} ${css.fontname} dark:text-white text-center`}
           value={text}
+          ref={inputref}
           placeholder="Enter text..."
           onChangeText={handlechange}
         />

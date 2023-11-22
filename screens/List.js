@@ -26,7 +26,7 @@ export default function List({ list, addnewvalues, navigation, geteditvalues }) 
             <Icon name='plus' style={{ width: 60, height: 60, fontSize: 50, color: 'white',  }} onPress={addnewvalues} />
           </View>
         </View>
-<View className="border mx-auto rounded-lg px-3 bg-slate-200" > 
+<View className="border mx-5 rounded-lg px-3 bg-slate-200" > 
 <Text className="bg-blue-600 text-white text-lg font-bold mb-3 me-2 px-2.5 py-2 rounded dark:bg-blue-900 dark:text-blue-300">List of  Items</Text>
         {list &&
           list

@@ -53,6 +53,7 @@ const App = () => {
     fontsize: " ",
     fontColor: " ",
   });
+  const[askcsschange,setaskcsschange]=useState(false)
 
   
 
@@ -73,8 +74,8 @@ const App = () => {
 }
 
 const savedTwoButtonAlert = () =>{
-  Alert.alert('Sucessfully Done', '', [
-      {text: 'OK', onPress: ()=>Save(editvalues,css,textedit)},
+  Alert.alert('Saved Successfully', '', [
+      {text: 'OK', onPress: ()=>Save(editvalues,css,textedit,true)},
   ]
   )
 }
@@ -105,6 +106,7 @@ const savedTwoButtonAlert = () =>{
               back();
             }
             settext('')
+            // settextedit('')
           },
           (error) => {
             console.error("Error updating csstable:", error);
@@ -112,6 +114,7 @@ const savedTwoButtonAlert = () =>{
         );
       });
     } else {
+      if(addnew){
       db.transaction((t) => {
         t.executeSql(
           "INSERT INTO csstable (Name, fontsize, fontcolor, Bgcolor) VALUES (?, ?, ?, ?)",
@@ -121,7 +124,7 @@ const savedTwoButtonAlert = () =>{
             setlist((prevList) => [
               ...prevList,
               {
-                id: results.insertId, // Include the inserted id
+                id: results.insertId, 
                 Name: text,
                 fontsize: css.fontsize,
                 fontColor: css.fontColor,
@@ -138,7 +141,10 @@ const savedTwoButtonAlert = () =>{
         );
       });
       settext('')
+      // settextedit('')
+      
     }
+  }
   };
   
   const refreshList = () => {
@@ -172,7 +178,7 @@ const savedTwoButtonAlert = () =>{
       ...prevValues,
       [field]: value,
     }));
- 
+    setaskcsschange(true)
   };
 // console.log(css.fontColor)
 
@@ -184,15 +190,21 @@ const addnewvalues=()=>{
 const back=()=>{
   setaddnew(false)
   seteditview(false)
+  settextedit('')
+  setaskcsschange(false)
+ 
 }
+console.log(askcsschange)
+console.log(textedit)
 
 const geteditvalues=(item)=>{
   seteditvalues(item)
   // console.log("getvaluesitem",editvalues)
  seteditview(true)
+ 
 }
 
-
+console.log(editvalues)
 
   useEffect(() => {
     db.transaction((t) => {
@@ -216,7 +228,7 @@ const geteditvalues=(item)=>{
  <View className="">
   <View className="flex-row items-center justify-around "> 
    
-   <Text className="bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xl px-3 py-3 mt-10 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" onPress={createTwoButtonAlert }><Icon name="arrow-left" style={{ color: 'white', textAlign: 'center', fontSize: 30  }}/></Text>
+   <Text className="bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xl px-3 py-3 mt-10 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" onPress={textedit||askcsschange?createTwoButtonAlert:back }><Icon name="arrow-left" style={{ color: 'white', textAlign: 'center', fontSize: 30  }}/></Text>
    
    <TextInput className="bg-transparent border hover:bg-blue-800 focus:ring-4  w-1/2 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xl px-3 py-3 mt-10 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"  placeholder="values..." value={text}/>
      <Text className="bg-white hover:bg-blue-800 focus:ring-4 focus:outline-none  focus:ring-blue-300  font-medium rounded-lg text-xl px-3 py-3  mt-10 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" onPress={savedTwoButtonAlert}><Icons name="edit" style={{ color: 'black', textAlign: 'center', fontSize: 30  }}/></Text>
