@@ -230,7 +230,7 @@ console.log(editvalues)
    
    <Text className="bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xl px-3 py-3 mt-10 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" onPress={textedit||askcsschange?createTwoButtonAlert:back }><Icon name="arrow-left" style={{ color: 'white', textAlign: 'center', fontSize: 30  }}/></Text>
    
-   <TextInput className="bg-transparent border hover:bg-blue-800 focus:ring-4  w-1/2 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xl px-3 py-3 mt-10 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"  placeholder="values..." value={text}/>
+   <TextInput className="bg-transparent border hover:bg-blue-800 focus:ring-4  w-1/2 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xl px-3 py-3 mt-10 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"  placeholder="values..." value={textedit}/>
      <Text className="bg-white hover:bg-blue-800 focus:ring-4 focus:outline-none  focus:ring-blue-300  font-medium rounded-lg text-xl px-3 py-3  mt-10 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" onPress={savedTwoButtonAlert}><Icons name="edit" style={{ color: 'black', textAlign: 'center', fontSize: 30  }}/></Text>
      </View>
      <Editpage
@@ -375,7 +375,12 @@ console.log(editvalues)
       >
         {props => <List {...props} list={list} addnewvalues={addnewvalues} geteditvalues={geteditvalues} />}
       </Stack.Screen>
-           <Stack.Screen name="Displaydata" >{props => <Displaydata {...props} list={list} />}</Stack.Screen>
+           <Stack.Screen name="Displaydata"  options={{
+            headerTransparent: true,
+            headerBackTitleVisible: false,
+            headerTintColor: 'black',
+            title: '',
+          }} >{props => <Displaydata {...props} list={list} />}</Stack.Screen>
            </Stack.Navigator>
            </NavigationContainer>
          </View>)}
