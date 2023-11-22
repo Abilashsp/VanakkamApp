@@ -22,11 +22,11 @@ const Stack = createNativeStackNavigator();
 
 const components = [
   {
-    "name": "Font Size",
+    "name": "Text Size",
     "comp": Fontsize
   },
   {
-    "name": "Font Color",
+    "name": "Text Color",
     "comp": Fontcolor
   },
   {
@@ -146,6 +146,7 @@ const savedTwoButtonAlert = () => {
                 Bgcolor: css.bgcolor,
               },
             ]);
+            refreshList(); 
             if (goBackAfterSave) {
               back();
             }
