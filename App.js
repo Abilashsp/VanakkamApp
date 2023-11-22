@@ -73,15 +73,30 @@ const App = () => {
   )
 }
 
-const savedTwoButtonAlert = () =>{
-  Alert.alert('Saved Successfully', '', [
-      {text: 'OK', onPress: ()=>Save(editvalues,css,textedit,true)},
-  ]
-  )
-}
+const savedTwoButtonAlert = () => {
+  if (textedit.trim() !== "") {
+    Alert.alert('Saved Successfully', '', [
+      {
+        text: 'OK',
+        onPress: () => Save(editvalues, css, textedit, true),
+      },
+    ]);
+  } else if (text.trim() !== "") {
+    // Handle the case where 'text' is not empty
+    Alert.alert('Saved Successfully', '', [
+      {
+        text: 'OK',
+        onPress: () => Save(editvalues, css, text, true),
+      },
+    ]);
+  } else {
+    Alert.alert("Please enter the text before saving.");
+  }
+};
+
 
   const Save = (id, updatedValues, edittedtext,goBackAfterSave) => {
-    if (editview) {
+    if (editview&&edittedtext.trim() !== "") {
       db.transaction((t) => {
         t.executeSql(
           "UPDATE csstable SET Name = ?, fontsize = ?, fontcolor = ?, Bgcolor = ? WHERE id = ?",
@@ -114,7 +129,7 @@ const savedTwoButtonAlert = () =>{
         );
       });
     } else {
-      if(addnew){
+      if(addnew&&text.trim() !== ""){
       db.transaction((t) => {
         t.executeSql(
           "INSERT INTO csstable (Name, fontsize, fontcolor, Bgcolor) VALUES (?, ?, ?, ?)",
